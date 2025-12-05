@@ -1,214 +1,453 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0,user-scalable=no" />
-<title>100문장</title>
-<link href="https://fonts.googleapis.com/css2?family=Gamja+Flower&display=swap" rel="stylesheet">
-<style>
-    body {
-        margin: 0;
-        padding: 0;
-        background: #f7f7f7;
-        font-family: "Gamja Flower", sans-serif;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        overflow: hidden;
+  <meta charset="UTF-8"/>
+  <title>지속하는 힘 문장 뽑기</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <!-- KkuBulLim Font (마지막 문장용) -->
+  <style>
+    @font-face {
+      font-family: 'KkuBulLim';
+      src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2410-1@1.0/BMkkubulimTTF-Regular.woff2') format('woff2');
+      font-weight: normal;
+      font-display: swap;
+    }
+  </style>
+
+  <!-- 기본 폰트 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Gowun+Dodum&family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <!-- html2canvas -->
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+  <style>
+    :root {
+      --bg:#f2f2f2;
+      --orange:#ff5b35;
+      --gray:#343434;
+
+      --font-main:"Gowun Dodum",sans-serif;
+      --font-ui:"Noto Sans KR",sans-serif;
     }
 
-    .container {
-        width: 100%;
-        max-width: 480px;
-        height: 100vh;
-        background: #f7f7f7;
-        overflow-y: auto;
-        padding: 20px;
-        box-sizing: border-box;
+    *{ box-sizing:border-box; }
+
+    body{
+      margin:0;
+      background:var(--bg);
+      display:flex;
+      justify-content:center;
+      font-family:var(--font-main);
+      overflow:hidden; /* 전체 스크롤 방지 */
     }
 
-    .step {
-        display: none;
-        flex-direction: column;
-        align-items: center;
-        justify-content: flex-start;
-        text-align: center;
-        min-height: 100%;
+    .app{
+      width:100%;
+      max-width:480px;
+      height:100vh;
+      background:#f2f2f2;
+      position:relative;
+      overflow:hidden;
     }
 
-    .active {
-        display: flex;
+    .screen{
+      position:absolute;
+      inset:0;
+      padding:0 20px 40px;
+      display:none;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      gap:24px;
     }
 
-    button {
-        width: 80%;
-        padding: 16px;
-        border-radius: 12px;
-        border: none;
-        font-size: 20px;
-        margin: 10px 0;
-        cursor: pointer;
-        font-family: "Gamja Flower";
+    .screen.active{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:flex-start;
+      gap:24px;
     }
 
-    .btn-orange {
-        background: #ff623d;
-        color: white;
+    /* 상단 영역 */
+    .top-star{
+      margin-top:70px;
+      width:100%;
+      display:flex;
+      justify-content:center;
     }
-    .btn-dark {
-        background: #333;
-        color: white;
+    
+    #step-5 .top-star{
+      margin-top:24px;
+    }
+.top-star img{ width:34px; height:34px; }
+
+    .top-visual{
+      margin-top:18px;
+      width:100%;
+      display:flex;
+      justify-content:center;
     }
 
-    /* STEP5 */
-    #step-5 {
-        padding-top: 16px;
-        gap: 20px;
+    .top-gif{
+      max-width:260px;
+      width:100%;
+      height:auto;
     }
 
-    .top-star {
-        width: 32px;
-        margin-top: 16px;
+    /* 버튼 공통 */
+    .btn{
+      border:none;
+      border-radius:999px;
+      padding:16px 20px;
+      font-size:18px;
+      font-family:var(--font-ui);
+      font-weight:500;
+      cursor:pointer;
+      background:var(--orange);
+      color:#fff;
+      width:100%;
+      max-width:360px;
     }
 
-    #final-quote {
-        font-size: 28px;
-        line-height: 1.5;
-        padding: 0 24px;
-        max-width: 360px;
+    .btn-secondary{
+      background:#343434;
+      color:#fff;
     }
 
-    .final-source {
-        margin-top: 12px;
-        text-align: center;
-        display: none;
+    .btn:active{
+      transform:translateY(1px);
     }
 
-    .final-source img {
-        width: 140px;
-        opacity: 0.9;
+    /* GIF 버튼 */
+    .gif-btn-wrap{
+      margin-top:40px;
+      width:100%;
+      display:flex;
+      justify-content:center;
     }
 
-    .yozmsa-logo {
-        width: 120px;
-        margin-top: 20px;
+    .gif-btn{
+      height:60px;
+      width:auto;
     }
 
-    /* 저장용 레이아웃 */
-    #save-layout {
-        width: 480px;
-        padding: 60px 40px;
-        background: linear-gradient(to bottom, #ffffff, #ffb19b);
-        text-align: center;
-        font-family: "Gamja Flower";
-        display: none;
+    /* STEP 3: 도형 영역 */
+    .shapes-wrapper{
+      margin-top:40px;
+      flex:1;
+      width:100%;
+      display:flex;
+      justify-content:center;
+      align-items:center;
     }
 
-    .save-top-star {
-        width: 50px;
-        margin-bottom: 20px;
+    .shapes-canvas{
+      position:relative;
+      width:260px;
+      height:320px;
     }
 
-    #save-quote {
-        font-size: 30px;
-        line-height: 1.5;
-        margin-bottom: 20px;
+    .shape{
+      position:absolute;
+      width:96px;
+      height:96px;
+      cursor:pointer;
     }
 
-    .save-source {
-        width: 160px;
-        margin: 12px auto 20px auto;
-        opacity: 0.9;
-        display: none;
+    .shape img{
+      width:100%;
+      height:100%;
     }
 
-    .save-logo {
-        width: 130px;
-        margin-top: 20px;
+    /* float animations */
+    .shape.s1{ animation:float1 4s ease-in-out infinite alternate; }
+    .shape.s2{ animation:float2 4.2s ease-in-out infinite alternate; }
+    .shape.s3{ animation:float3 3.8s ease-in-out infinite alternate; }
+    .shape.s4{ animation:float4 4.4s ease-in-out infinite alternate; }
+
+    @keyframes float1{ 0%{transform:translate(0,0);} 100%{transform:translate(4px,-8px);} }
+    @keyframes float2{ 0%{transform:translate(0,0);} 100%{transform:translate(-6px,-6px);} }
+    @keyframes float3{ 0%{transform:translate(0,0);} 100%{transform:translate(5px,6px);} }
+    @keyframes float4{ 0%{transform:translate(0,0);} 100%{transform:translate(-4px,4px);} }
+
+    /* STEP 4: 로딩 */
+    .loading-icon{
+      width:40px;
+      height:40px;
+      border-radius:10px;
+      background:var(--orange);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-top:40px;
     }
-</style>
+    .loading-icon img{
+      width:26px;
+      height:26px;
+    }
+
+    .loading-text{
+      margin-top:24px;
+      font-size:16px;
+      color:#555;
+      font-family:var(--font-ui);
+    }
+
+    /* ===== STEP 5 결과 페이지 ===== */
+    #step-5{
+      padding-top:24px;
+      padding-bottom:0;
+      gap:20px;
+      justify-content:flex-start;
+      min-height:100%;
+    }
+
+    /* ★ 마지막 문장 (화면용) */
+    .quote{
+      font-size:32px;
+      line-height:52px;
+      max-width:90%;
+      text-align:center;
+      font-family:'KkuBulLim', sans-serif;
+      color:#FF5B35;
+      margin-top:0;
+    }
+
+    .quote-source{
+      margin-top:12px;
+      text-align:center;
+    }
+    .quote-source img{
+      height:24px;
+      width:auto;
+    }
+
+    .result-logo img{
+      height:40px;
+      margin-top:10px;
+    }
+
+    .result-buttons{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap:12px;
+      width:100%;
+      margin-bottom:20px;
+    }
+
+    .result-buttons .btn{
+      width:80%;
+      max-width:320px;
+    }
+
+    /* 하단 고정 로고 + 그라데이션 */
+    .logo-area{
+      position:absolute;
+      bottom:70px;
+      left:0;
+      width:100%;
+      display:flex;
+      justify-content:center;
+      pointer-events:none;
+    }
+
+    .logo-area img{
+      height:34px;
+    }
+
+    .bottom-gradient{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom:0;
+      height:120px;
+      background:linear-gradient(
+        to bottom,
+        rgba(242,242,242,0) 0%,
+        rgba(255,91,53,0.9) 50%,
+        rgba(255,91,53,1) 100%
+      );
+      z-index:-1;
+    }
+
+    /* ===== 저장 이미지 ===== */
+    #save-layout{
+      position:absolute;
+      left:-9999px;
+      top:0;
+      width:360px;
+      background:linear-gradient(
+        to bottom,
+        #f2f2f2 0%,
+        #f2f2f2 55%,
+        #ff5b35 100%
+      );
+      padding:40px 24px 0;
+    }
+
+    /* ★ 저장 이미지 글귀 */
+    #save-quote{
+      font-size:26px;
+      line-height:42px;
+      max-width:90%;
+      margin:0 auto;
+      text-align:center;
+      font-family:'KkuBulLim', sans-serif;
+      color:#FF5B35;
+    }
+
+    #save-source{
+      text-align:center;
+    }
+    #save-source img{
+      height:24px;
+      display:block;
+      margin:16px auto 0;
+    }
+
+    #save-logo img{
+      height:40px;
+      display:block;
+      margin:40px auto;
+    }
+  </style>
 </head>
 
 <body>
-<div class="container">
+<div class="app">
 
-    <!-- STEP 5 : 결과 화면 -->
-    <div id="step-5" class="step active">
-        <img src="star.png" class="top-star">
+  <!-- STEP 1 -->
+  <section class="screen active" id="step-1">
+    <div class="top-star"><img src="star.png"></div>
+    <div class="top-visual"><img src="q01.gif" class="top-gif"></div>
+    <div class="gif-btn-wrap"><img src="btn_1.gif" class="gif-btn" onclick="goToStep(2)"></div>
+  </section>
 
-        <div id="final-quote"></div>
+  <!-- STEP 2 -->
+  <section class="screen" id="step-2">
+    <div class="top-star"><img src="star.png"></div>
+    <div class="top-visual"><img src="q02.gif" class="top-gif"></div>
+    <button class="btn" onclick="goToStep(3)">고민을 떠올렸으면 누르기</button>
+  </section>
 
-        <!-- 출처 (이미지) -->
-        <div id="final-source" class="final-source">
-            <img src="book.png" alt="출처">
-        </div>
+  <!-- STEP 3 -->
+  <section class="screen" id="step-3">
+    <div class="top-star"><img src="star.png"></div>
+    <div class="top-visual"><img src="q03.gif" class="top-gif"></div>
 
-        <img src="yozmsa.png" class="yozmsa-logo">
+    <div class="shapes-wrapper">
+      <div class="shapes-canvas">
 
-        <button class="btn-orange" onclick="window.open('https://product.kyobobook.co.kr/detail/S000215448908','_blank')">
-            문장이 담긴 책 보기
-        </button>
+        <div class="shape s1" style="left:0%; top:6%;" onclick="pickShape()"><img src="shape02.gif"></div>
+        <div class="shape s2" style="left:35%; top:-6%;" onclick="pickShape()"><img src="shape01.gif"></div>
+        <div class="shape s3" style="left:62%; top:10%;" onclick="pickShape()"><img src="shape03.gif"></div>
+        <div class="shape s4" style="left:12%; top:40%;" onclick="pickShape()"><img src="shape03.gif"></div>
+        <div class="shape s1" style="left:52%; top:40%;" onclick="pickShape()"><img src="shape02.gif"></div>
+        <div class="shape s2" style="left:0%; top:70%;" onclick="pickShape()"><img src="shape01.gif"></div>
+        <div class="shape s3" style="left:36%; top:68%;" onclick="pickShape()"><img src="shape03.gif"></div>
+        <div class="shape s4" style="left:68%; top:72%;" onclick="pickShape()"><img src="shape02.gif"></div>
 
-        <button class="btn-dark" onclick="saveImage()">저장하기</button>
+      </div>
     </div>
 
+    <button class="btn" onclick="pickShape()">마음 가는 도형을 눌러보기</button>
+  </section>
+
+  <!-- STEP 4: 로딩 -->
+  <section class="screen" id="step-4">
+    <div class="top-star"><img src="star.png"></div>
+    <div class="loading-icon"><img src="sparkle.png"></div>
+    <div class="loading-text">지금 이 순간의 현우님에게 필요한 문장을 찾고 있습니다...</div>
+  </section>
+
+  <!-- STEP 5 결과 페이지 -->
+  <section class="screen" id="step-5">
+    <div class="top-star"><img src="star.png"></div>
+
+    <div class="quote" id="quote-text"></div>
+
+    <div class="quote-source"><img src="book.png" alt="&lt;지속하는 힘&gt; 중에서"></div>
+
+    <div class="result-logo"><img src="logo.png"></div>
+
+    <div class="result-buttons">
+      <button class="btn" onclick="openBookLink()">문장이 담긴 책 보기</button>
+      <button class="btn btn-secondary" onclick="saveImage()">저장하기</button>
+    </div>
+  </section>
+
+  <div class="logo-area"><img src="logo.png"></div>
+  <div class="bottom-gradient"></div>
 </div>
 
-<!-- 저장용 이미지 템플릿 -->
+<!-- 저장 이미지 -->
 <div id="save-layout">
-    <img src="star.png" class="save-top-star">
-    <div id="save-quote"></div>
-
-    <!-- 출처(이미지) -->
-    <img src="book.png" class="save-source">
-
-    <img src="yozmsa.png" class="save-logo">
+  <div id="save-quote"></div>
+  <div id="save-source"><img src="book.png" alt="&lt;지속하는 힘&gt; 중에서"></div>
+  <div id="save-logo"><img src="logo.png"></div>
 </div>
-
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <script>
-let quotes = [];
+  let sentences=[];
+  let currentSentence="";
 
-/* CSV 로딩 */
-fetch("pp100.csv")
-    .then(res => res.text())
-    .then(text => {
-        quotes = text.split("\n").map(q => q.trim()).filter(q => q.length > 0);
-        showRandomQuote();
+  async function loadSentences(){
+    try{
+      const res=await fetch("pp100.csv");
+      const text=await res.text();
+      sentences=text.split("\n").map(s=>s.trim()).filter(s=>s.length>0);
+    }catch(e){
+      console.error(e);
+    }
+  }
+
+  function goToStep(step){
+    document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+    document.getElementById(`step-${step}`).classList.add("active");
+  }
+
+  function pickShape(){
+    goToStep(4);
+
+    setTimeout(()=>{
+      showRandomSentence();
+    },1800);
+  }
+
+  function showRandomSentence(){
+    if(sentences.length===0){
+      currentSentence="문장을 불러오는 중입니다.";
+    } else {
+      const i=Math.floor(Math.random()*sentences.length);
+      currentSentence=sentences[i];
+    }
+
+    document.getElementById("quote-text").textContent=currentSentence;
+    document.getElementById("save-quote").textContent=currentSentence;
+
+    goToStep(5);
+  }
+
+  function openBookLink(){
+    window.open("https://yozmsa.com/shop/?idx=50","_blank");
+  }
+
+  function saveImage(){
+    const node=document.getElementById("save-layout");
+    html2canvas(node,{scale:3,useCORS:true}).then(canvas=>{
+      const link=document.createElement("a");
+      link.href=canvas.toDataURL("image/png");
+      link.download="지속하는힘_오늘의문장.png";
+      link.click();
     });
+  }
 
-/* 랜덤 문장 출력 */
-function showRandomQuote() {
-    if (quotes.length === 0) return;
-
-    let randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
-
-    // STEP5 문장 적용
-    document.getElementById("final-quote").innerHTML = randomQuote;
-    document.getElementById("final-source").style.display = "block";
-
-    // 저장 이미지 문장 적용
-    document.getElementById("save-quote").innerHTML = randomQuote;
-    document.querySelector(".save-source").style.display = "block";
-}
-
-/* 저장 이미지 생성 */
-function saveImage() {
-    const target = document.getElementById("save-layout");
-
-    target.style.display = "block";
-
-    html2canvas(target, { scale: 3 }).then(canvas => {
-        const link = document.createElement("a");
-        link.download = "my_sentence.png";
-        link.href = canvas.toDataURL("image/png");
-        link.click();
-
-        target.style.display = "none";
-    });
-}
+  window.addEventListener("load", loadSentences);
 </script>
 
 </body>
